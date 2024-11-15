@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  book-service:
+    build: ./book_service
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./book_service:/app
+      - book_data:/app/data
+    networks:
+      - booknet
+
+  review-service:
+    build: ./review_service
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./review_service:/app
+      - review_data:/app/data
+    environment:
+      - BOOK_SERVICE_URL=http://book-service:5001/api/books
+    networks:
+      - booknet
+    depends_on:
+      - book-service
+
+  web-interface:
+    build: ./web_interface
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web_interface:/app
+    networks:
+      - booknet
+    depends_on:
+      - book-service
+      - review-service
+
+networks:
+  booknet:
+    driver: bridge
+
+volumes:
+  book_data:
+  review_data:

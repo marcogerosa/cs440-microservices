@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Reviews</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ book['title'] }} - Reviews</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="book-details">
+            <h2>Book Details</h2>
+            <p>Author: {{ book['author'] }}</p>
+            <p>Year: {{ book['year'] }}</p>
+        </div>
+
+        <form action="{{ url_for('add_review') }}" method="post" class="add-form">
+            <h2>Add Review</h2>
+            <input type="hidden" name="book_id" value="{{ book['id'] }}">
+            <input type="text" name="reviewer" placeholder="Your Name" required>
+            <select name="rating" required>
+                <option value="">Select Rating</option>
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+            <textarea name="comment" placeholder="Your Review" required></textarea>
+            <button type="submit">Submit Review</button>
+        </form>
+
+        <div class="reviews-list">
+            <h2>Reviews</h2>
+            {% for review in reviews %}
+            <div class="review-card">
+                <p class="rating">Rating: {{ '★' * review['rating'] }}{{ '☆' * (5 - review['rating']) }}</p>
+                <p class="comment">{{ review['comment'] }}</p>
+                <p class="reviewer">By {{ review['reviewer'] }} on {{ review['date'] }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <a href="{{ url_for('books') }}" class="button">Back to Books</a>
+    </div>
+</body>
+</html>
